@@ -35,27 +35,31 @@ module.exports = function toReadable(num) {
         "eighty",
         "ninety",
     ];
-    const types = {
-        2: "hundred",
-        3: "thousand",
-        6: "million",
-    };
-    let arr = String(num).split("");
-    let newArr = [];
-    switch (arr.length) {
-        case 1:
-            return numbers[arr[0]];
-        case 2:
-            return tens[arr[1]];
-        default:
-            for (let i = arr.length - 1; i >= 0; i--) {
-                if (i === 1)
-                    newArr.push(
-                        dozens[arr.shift()] + " " + numbers[arr.shift()]
-                    );
-                if (types[i])
-                    newArr.push(numbers[arr.shift()] + " " + types[i]);
-            }
+
+    function fun(arr) {
+        switch (arr.length) {
+            case 1:
+                return numbers[arr[0]];
+            case 2:
+                if (arr[0] === "1") {
+                    return tens[arr[1]];
+                } else if (arr[0] === "0") {
+                    arr.shift();
+                    return numbers[arr.shift()];
+                } else {
+                    return dozens[arr.shift()] + " " + numbers[arr.shift()];
+                }
+            case 3:
+                return numbers[arr.shift()] + " hundred ";
+            case 4:
+                return tens[arr[1]] + " thousand ";
+        }
     }
-    return newArr.join(" ");
+
+    let arr = String(num).split("");
+    let str = "";
+    while (arr) {
+        str += fun(arr);
+    }
+    return str;
 };
